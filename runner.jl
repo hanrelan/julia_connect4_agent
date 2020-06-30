@@ -32,6 +32,8 @@ function run_episode(player1, player2)
         (other_player, other_agent) = (current_player, current_agent)
         (current_player, current_agent) = (temp_player, temp_agent)
     end
+    current_player = current_agent.end_episode(current_player)
+    other_player = other_agent.end_episode(other_player)
 
     # println(game_state)
     game_state
