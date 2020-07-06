@@ -8,7 +8,7 @@ startRandomAgent() = RandomAgent()
 function get_action(state::RandomAgent, _game_state, actions)
     index = rand(1:length(actions))
     action = actions[index]
-    (state, action)
+    action
 end
 
 rewardAgent(state::RandomAgent, reward) = state

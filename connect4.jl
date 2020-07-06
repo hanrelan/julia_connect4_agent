@@ -48,12 +48,12 @@ function act(state::GameState, column::UInt8)
         error("Tried to place a piece in a filled column")
     end
     board[column, empty_row_index] = state.turn
-    if did_win(board, state.turn)
-        new_status = state.turn == 1 ? player1_win : player2_win
+    new_status = if did_win(board, state.turn)
+        state.turn == 1 ? player1_win : player2_win
     elseif length(get_actions(board)) == 0
-        new_status = tie
+        tie
     else
-        new_status = undecided
+        undecided
     end
     reward = (new_status == player1_win || new_status == player2_win) ? 1 : 0
     new_state = GameState(board, swap_turn(state.turn), new_status)
@@ -70,11 +70,9 @@ function check_connect(board::Board, player, dc, dr)
     end_column = dc >= 0 ?  num_columns - dc * 3 : num_columns
     start_row = dr >= 0 ? 1 : 4
     end_row  = dr >= 0 ? num_rows - dr * 3 : num_rows
-    for c in start_column:end_column
-        for r in start_row:end_row
-            if board[c, r] == player && board[c + dc, r + dr] == player && board[c + 2 * dc, r + 2 * dr] == player && board[c + 3 * dc, r + 3 * dr] == player
-                return true
-            end
+    for c in start_column:end_column, r in start_row:end_row
+        if board[c, r] == player && board[c + dc, r + dr] == player && board[c + 2 * dc, r + 2 * dr] == player && board[c + 3 * dc, r + 3 * dr] == player
+            return true
         end
     end
     return false

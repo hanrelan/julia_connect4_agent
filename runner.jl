@@ -2,11 +2,12 @@ import Base.show
 include("connect4.jl")
 include("agent.jl")
 include("random_agent.jl")
+include("simple_agent.jl")
 
 import .Connect4
 
 player1 = startRandomAgent()
-player2 = startRandomAgent()
+player2 = startSimpleAgent()
 
 function run_episode(player1, player2)
     game_state = Connect4.start()
@@ -14,7 +15,7 @@ function run_episode(player1, player2)
     other_player = player2
     while !Connect4.gameover(game_state)
         possible_actions = Connect4.get_actions(game_state)
-        (current_player, action) = get_action(current_player, game_state, possible_actions)
+        action = get_action(current_player, game_state, possible_actions)
         (game_state, (current_player_reward, other_player_reward)) = Connect4.act(game_state, action)
         current_player = rewardAgent(current_player, current_player_reward)
         other_player = rewardAgent(other_player, other_player_reward * -1)
