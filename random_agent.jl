@@ -1,18 +1,16 @@
-module RandomAgent
+include("agent.jl")
 
-function start() 
-    nothing
+struct RandomAgent <: Agent
 end
 
-function get_action(state, _game_state, actions)
+startRandomAgent() = RandomAgent()
+
+function get_action(state::RandomAgent, _game_state, actions)
     index = rand(1:length(actions))
     action = actions[index]
     (state, action)
 end
 
-function give_reward(state, reward)
-    state
-end
+rewardAgent(state::RandomAgent, reward) = state
 
-export start, get_action
-end
+end_episode(state::RandomAgent) = state
