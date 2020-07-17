@@ -87,6 +87,9 @@ did_win(board, turn) =
 
 gameover(state::GameState) = state.status != undecided
 
-export start, get_actions, act, show, gameover
+export GameState, start, get_actions, act, show, gameover
 
 end
+
+state = Connect4.start()
+size(state.board)

@@ -3,10 +3,11 @@ include("connect4.jl")
 include("agent.jl")
 include("random_agent.jl")
 include("simple_agent.jl")
+include("learning_agent.jl")
 
 import .Connect4
 
-player1 = startRandomAgent()
+player1 = startLearningAgent()
 player2 = startSimpleAgent()
 
 function run_episode(player1, player2)
@@ -34,7 +35,7 @@ function run_simulation()
     player1_wins = 0
     player2_wins = 0
     ties = 0
-    for i in 1:100000
+    for i in 1:10000
         game_state = run_episode(player1, player2)
         if game_state.status == Connect4.player1_win
             player1_wins += 1
@@ -46,8 +47,8 @@ function run_simulation()
             throw("Unknown status at end of episode")
         end
     end
-    println(player1_wins)
-    println(player2_wins)
+    println("$(typeof(player1)) $player1_wins")
+    println("$(typeof(player2)) $player2_wins")
     println(ties)
 end
 run_simulation()
