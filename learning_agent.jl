@@ -4,11 +4,12 @@ using Flux
 
 struct LearningAgent <: Agent
     model
+    game_states
 end
 
 function startLearningAgent() 
     model = Chain(Dense(43, 10, relu), Dense(10, 1, tanh))
-    LearningAgent(model)
+    LearningAgent(model, [])
 end
 
 function get_values(state::LearningAgent, states)
@@ -25,6 +26,8 @@ function get_action(state::LearningAgent, game_state, actions)
     actions[index] # Need to take the second element since the first element is always 1
 end
 
-rewardAgent(state::LearningAgent, reward) = state
+function pushState(state::LearningAgent, game_state)
+    LearningAgent(state.model, push!(state.game_states, game_state))
+end
 
-end_episode(state::LearningAgent) = state
+end_episode(state::LearningAgent, reward) = state

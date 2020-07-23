@@ -11,6 +11,7 @@ function get_action(state::RandomAgent, _game_state, actions)
     action
 end
 
-rewardAgent(state::RandomAgent, reward) = state
+function pushState(::RandomAgent, game_state)
+end
 
-end_episode(state::RandomAgent) = state
+end_episode(state::RandomAgent, reward) = state

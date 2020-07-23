@@ -18,14 +18,20 @@ function run_episode(player1, player2)
         possible_actions = Connect4.get_actions(game_state)
         action = get_action(current_player, game_state, possible_actions)
         (game_state, (current_player_reward, other_player_reward)) = Connect4.act(game_state, action)
-        current_player = rewardAgent(current_player, current_player_reward)
-        other_player = rewardAgent(other_player, other_player_reward * -1)
-        temp_player = other_player
-        other_player = current_player
-        current_player = temp_player
+        pushState(current_player, game_state)
+        (current_player, other_player) = (other_player, current_player)
     end
-    current_player = end_episode(current_player)
-    other_player = end_episode(other_player)
+    (player1_reward, player2_reward) = if game_state.status == Connect4.player1_win
+        (1, -1)
+    elseif game_state.status == Connect4.player2_win
+        (-1, 1)
+    elseif game_state.status == tie
+        (0, 0)
+    else
+        throw("Unknown status at end of episode")
+    end
+    end_episode(player1, player1_reward)
+    end_episode(player2, player2_reward)
 
     game_state
 end

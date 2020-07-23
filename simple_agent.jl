@@ -17,6 +17,7 @@ function get_action(state::SimpleAgent, game_state, actions)
     actions[index]
 end
 
-rewardAgent(state::SimpleAgent, reward) = state
+function pushState(::SimpleAgent, game_state)
+end
 
-end_episode(state::SimpleAgent) = state
+end_episode(state::SimpleAgent, reward) = state
