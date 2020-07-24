@@ -29,7 +29,7 @@ end
 
 function start_learning_agent() 
     model = Chain(Dense(43, 10, relu), Dense(10, 1, tanh))
-    model_train = ModelTrainingInfo(ADAM(0.1, (0.9, 0.8)), Flux.params(model))
+    model_train = ModelTrainingInfo(ADAM(0.001, (0.9, 0.8)), Flux.params(model))
     LearningAgent(model, [], model_train)
 end
 
@@ -42,9 +42,8 @@ function get_action(state::LearningAgent, game_state, actions)
     board = game_state.board
     next_states = map(action -> Connect4.act(game_state, action)[1], actions)
     values = get_values(state, next_states)
-    (_, index) = findmax(values[1])
-    println(index)
-    actions[index] 
+    (_, index) = findmax(values)
+    actions[index[2]] 
 end
 
 function push_state!(state::LearningAgent, game_state)
