@@ -7,5 +7,5 @@ end
 
 function end_episode(::Agent, reward) end
 
-function pushState(::Agent, game_state)
+function push_state!(::Agent, game_state)
 end

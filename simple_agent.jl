@@ -5,7 +5,7 @@ using Random
 struct SimpleAgent <: Agent
 end
 
-startSimpleAgent() = SimpleAgent()
+start_simple_agent() = SimpleAgent()
 
 function get_value(game_state::Connect4.GameState)
     (game_state.status == Connect4.player1_win || game_state.status == Connect4.player2_win) ? 101 : rand(1:100)
@@ -17,7 +17,7 @@ function get_action(state::SimpleAgent, game_state, actions)
     actions[index]
 end
 
-function pushState(::SimpleAgent, game_state)
+function push_state!(::SimpleAgent, game_state)
 end
 
 end_episode(state::SimpleAgent, reward) = state
