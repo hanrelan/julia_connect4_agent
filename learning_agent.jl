@@ -43,6 +43,12 @@ function get_action(state::LearningAgent, game_state, actions)
     next_states = map(action -> Connect4.act(game_state, action)[1], actions)
     values = get_values(state, next_states)
     (_, index) = findmax(values)
+    if false
+        println(game_state)
+        println(values)
+        println(index[2])
+        println("--------")
+    end
     actions[index[2]] 
 end
 
@@ -51,6 +57,9 @@ function push_state!(state::LearningAgent, game_state)
 end
 
 function end_episode(state::LearningAgent, reward)
+    if false
+        println("Reward $reward")
+    end
     train!(state, reward)
     LearningAgent(state.model, [], state.model_train)
 end
