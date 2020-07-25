@@ -33,7 +33,7 @@ function run_episode(player1, player2)
     player1 = end_episode(player1, player1_reward)
     player2 = end_episode(player2, player2_reward)
 
-    game_state
+    (player1, player2, game_state)
 end
 
 function print_winrate(tag, player1, player2, player1_wins, player2_wins, ties)
@@ -48,7 +48,7 @@ function print_winrate(tag, player1, player2, player1_wins, player2_wins, ties)
 end
 
 
-function run_simulation()
+function run_simulation(player1, player2)
     (player1_wins, player2_wins, ties) = (0, 0, 0)
     (player1_wins_last_n, player2_wins_last_n, ties_last_n) = (0, 0, 0)
     (player1_wins_first_n, player2_wins_first_n, ties_first_n) = (0, 0, 0)
@@ -61,7 +61,7 @@ function run_simulation()
             print_winrate("Running count: $i", player1, player2, player1_wins_running, player2_wins_running, ties_running)
             (player1_wins_running, player2_wins_running, ties_running) = (0, 0, 0)
         end
-        game_state = run_episode(player1, player2)
+        (player1, player2, game_state) = run_episode(player1, player2)
         if game_state.status == Connect4.player1_win
             if i > last_n_start
                 player1_wins_last_n += 1
@@ -93,5 +93,6 @@ function run_simulation()
     print_winrate("First $n", player1, player2, player1_wins_first_n, player2_wins_first_n, ties_first_n)
     print_winrate("Last $n", player1, player2, player1_wins_last_n, player2_wins_last_n, ties_last_n)
     print_winrate("Overall", player1, player2, player1_wins, player2_wins, ties)
+    (player1, player2)
 end
-run_simulation()
+(player1, player2) = run_simulation(player1, player2)
