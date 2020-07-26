@@ -8,7 +8,8 @@ include("learning_agent.jl")
 import .Connect4
 
 player1 = start_learning_agent()
-player2 = start_simple_agent()
+player2 = start_random_agent()
+
 
 function run_episode(player1, player2)
     game_state = Connect4.start()
@@ -53,11 +54,12 @@ function run_simulation(player1, player2)
     (player1_wins_last_n, player2_wins_last_n, ties_last_n) = (0, 0, 0)
     (player1_wins_first_n, player2_wins_first_n, ties_first_n) = (0, 0, 0)
     (player1_wins_running, player2_wins_running, ties_running) = (0, 0, 0)
-    total = 2000
-    n = 200
+    total = 300000
+    n = 2000
+    print_every = 10000
     last_n_start = total - n
     for i in 1:total
-        if mod(i, 100) == 0
+        if mod(i, print_every) == 0
             print_winrate("Running count: $i", player1, player2, player1_wins_running, player2_wins_running, ties_running)
             (player1_wins_running, player2_wins_running, ties_running) = (0, 0, 0)
         end

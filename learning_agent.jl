@@ -7,17 +7,26 @@ struct ModelTrainingInfo
     params
 end
 
+struct EpisodeResult
+    game_states
+    reward
+end
+
 struct LearningAgent <: Agent
     model
     game_states
+    episode_results
     model_train::ModelTrainingInfo
 end
 
-function train!(state::LearningAgent, reward)
-    batch_size = length(state.game_states)
-    batch_rewards = fill(reward, (1, batch_size))
-    batch_states = create_batch(state.game_states)
-    data = Flux.Data.DataLoader(batch_states, batch_rewards, batchsize=minimum([128, batch_size]))
+function train!(state::LearningAgent)
+    batch_rewards = []
+    batch_states = []
+    batch_rewards = map(episode -> fill(episode.reward, (1, length(episode.game_states))), state.episode_results)
+    batch_rewards =  reduce(hcat, batch_rewards)
+    batch_states = map(episode -> create_batch(episode.game_states), state.episode_results)
+    batch_states =  reduce(hcat, batch_states)
+    data = Flux.Data.DataLoader(batch_states, batch_rewards, batchsize=128, shuffle=true)
     loss(x, y) = Flux.Losses.mse(state.model(x), y)
     Flux.train!(loss, state.model_train.params, data, state.model_train.opt)
 end
@@ -28,9 +37,9 @@ function create_batch(states)
 end
 
 function start_learning_agent() 
-    model = Chain(Dense(43, 10, relu), Dense(10, 1, tanh))
-    model_train = ModelTrainingInfo(ADAM(0.001, (0.9, 0.8)), Flux.params(model))
-    LearningAgent(model, [], model_train)
+    model = Chain(Dense(43, 50, sigmoid), Dense(50, 10, sigmoid), Dense(10, 1, tanh))
+    model_train = ModelTrainingInfo(ADAM(0.0001, (0.9, 0.8)), Flux.params(model))
+    LearningAgent(model, [], [], model_train)
 end
 
 function get_values(state::LearningAgent, states)
@@ -53,15 +62,21 @@ function get_action(state::LearningAgent, game_state, actions)
 end
 
 function push_state!(state::LearningAgent, game_state)
-    LearningAgent(state.model, push!(state.game_states, game_state), state.model_train)
+    LearningAgent(state.model, push!(state.game_states, game_state), state.episode_results, state.model_train)
 end
 
 function end_episode(state::LearningAgent, reward)
     if false
         println("Reward $reward")
     end
-    train!(state, reward)
-    LearningAgent(state.model, [], state.model_train)
+    episode_result = EpisodeResult(state.game_states, reward)
+    episode_results = push!(state.episode_results, episode_result)
+    if length(episode_results) >= 300
+        train!(state)
+        LearningAgent(state.model, [], [], state.model_train)
+    else
+        LearningAgent(state.model, [], episode_results, state.model_train)
+    end
 end
 
 # agent = start_learning_agent()
