@@ -20,7 +20,6 @@ struct LearningAgent <: Agent
 end
 
 function train!(state::LearningAgent)
-    return
     batch_rewards = []
     batch_states = []
     batch_rewards = map(episode -> fill(episode.reward, (1, length(episode.game_states))), state.episode_results)
