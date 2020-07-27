@@ -20,6 +20,7 @@ struct LearningAgent <: Agent
 end
 
 function train!(state::LearningAgent)
+    return
     batch_rewards = []
     batch_states = []
     batch_rewards = map(episode -> fill(episode.reward, (1, length(episode.game_states))), state.episode_results)
@@ -32,12 +33,12 @@ function train!(state::LearningAgent)
 end
 
 function create_batch(states)
-    flattened_states = map(game_state -> [reshape(game_state.board, 42); game_state.turn], states)
+    flattened_states = map(game_state -> vcat(map(piece -> Flux.onehot(piece, [0, 1, 2]), reshape(game_state.board, 42))...), states)
     batch_states = reduce(hcat, flattened_states)
 end
 
 function start_learning_agent() 
-    model = Chain(Dense(43, 50, sigmoid), Dense(50, 10, sigmoid), Dense(10, 1, tanh))
+    model = Chain(Dense(6 * 7 * 3, 50, sigmoid), Dense(50, 10, sigmoid), Dense(10, 1, tanh))
     model_train = ModelTrainingInfo(ADAM(0.0001, (0.9, 0.8)), Flux.params(model))
     LearningAgent(model, [], [], model_train)
 end
