@@ -42,13 +42,12 @@ swap_turn(turn::UInt8) = turn == 1 ? 2 : 1
 function act(state::GameState, column::UInt8)
     board = copy(state.board)
     (num_columns, num_rows) = size(board)
-    updated = false
     empty_row_index = findfirst(board[column, :] .== 0)
     if empty_row_index === nothing
         error("Tried to place a piece in a filled column")
     end
     board[column, empty_row_index] = state.turn
-    new_status = if did_win(board, state.turn)
+    new_status = if did_win(board, state.turn, (column, empty_row_index))
         state.turn == 1 ? player1_win : player2_win
     elseif length(get_actions(board)) == 0
         tie
@@ -64,12 +63,23 @@ get_actions(state::GameState) = get_actions(state.board)
 
 get_actions(board::Board) = convert(Array{UInt8}, findall(board[:,end] .== 0))
 
-function check_connect(board::Board, player, dc, dr)
+function check_connect(board::Board, player, dc, dr, last_move)
+    (last_column, last_row) = last_move
     (num_columns, num_rows) = size(board)
-    start_column = dc >= 0 ? 1 : 4
-    end_column = dc >= 0 ?  num_columns - dc * 3 : num_columns
-    start_row = dr >= 0 ? 1 : 4
-    end_row  = dr >= 0 ? num_rows - dr * 3 : num_rows
+    (start_column, end_column) = if dc == 0
+        (last_column, last_column)
+    elseif dc > 0
+        (maximum([1, last_column - 3*dc]), minimum([last_column + 3*dc, num_columns - dc * 3]))
+    else
+        (maximum([4, last_column]), minimum([last_column - 3*dc, num_columns]))
+    end
+    (start_row, end_row) = if dr == 0
+        (last_row, last_row)
+    elseif dr > 0
+        (maximum([1, last_row - 3*dr]), minimum([last_row + 3*dr, num_rows - dr * 3]))
+    else
+        (maximum([4, last_row]), minimum([last_row - 3*dr, num_rows]))
+    end
     for c in start_column:end_column, r in start_row:end_row
         if board[c, r] == player && board[c + dc, r + dr] == player && board[c + 2 * dc, r + 2 * dr] == player && board[c + 3 * dc, r + 3 * dr] == player
             return true
@@ -78,12 +88,15 @@ function check_connect(board::Board, player, dc, dr)
     return false
 end
 
+
 # Did the last player to play win
-did_win(board, turn) =
-    check_connect(board, turn, 1, 0) || 
-    check_connect(board, turn, 0, 1) ||
-    check_connect(board, turn, 1, 1) ||
-    check_connect(board, turn, -1, 1)
+did_win(board, turn, last_move) =
+    check_connect(board, turn, 1, 0, last_move) ||
+    check_connect(board, turn, 0, 1, last_move) ||
+    check_connect(board, turn, 1, 1, last_move) ||
+    check_connect(board, turn, -1, 1, last_move)
+
+
 
 gameover(state::GameState) = state.status != undecided
 
