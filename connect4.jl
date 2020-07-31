@@ -63,22 +63,22 @@ get_actions(state::GameState) = get_actions(state.board)
 
 get_actions(board::Board) = convert(Array{UInt8}, findall(board[:,end] .== 0))
 
-function check_connect(board::Board, player, dc, dr, last_move)
+function check_connect(board::Board, player::UInt8, dc, dr, last_move)
     (last_column, last_row) = last_move
     (num_columns, num_rows) = size(board)
     (start_column, end_column) = if dc == 0
         (last_column, last_column)
     elseif dc > 0
-        (maximum([1, last_column - 3*dc]), minimum([last_column + 3*dc, num_columns - dc * 3]))
+        (maximum([1, last_column - 3 * dc]), minimum([last_column + 3 * dc, num_columns - dc * 3]))
     else
-        (maximum([4, last_column]), minimum([last_column - 3*dc, num_columns]))
+        (maximum([4, last_column]), minimum([last_column - 3 * dc, num_columns]))
     end
     (start_row, end_row) = if dr == 0
         (last_row, last_row)
     elseif dr > 0
-        (maximum([1, last_row - 3*dr]), minimum([last_row + 3*dr, num_rows - dr * 3]))
+        (maximum([1, last_row - 3 * dr]), minimum([last_row + 3 * dr, num_rows - dr * 3]))
     else
-        (maximum([4, last_row]), minimum([last_row - 3*dr, num_rows]))
+        (maximum([4, last_row]), minimum([last_row - 3 * dr, num_rows]))
     end
     for c in start_column:end_column, r in start_row:end_row
         if board[c, r] == player && board[c + dc, r + dr] == player && board[c + 2 * dc, r + 2 * dr] == player && board[c + 3 * dc, r + 3 * dr] == player
@@ -90,7 +90,7 @@ end
 
 
 # Did the last player to play win
-did_win(board, turn, last_move) =
+did_win(board::Board, turn::UInt8, last_move::Tuple{UInt8,Int64}) =
     check_connect(board, turn, 1, 0, last_move) ||
     check_connect(board, turn, 0, 1, last_move) ||
     check_connect(board, turn, 1, 1, last_move) ||

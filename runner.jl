@@ -54,7 +54,7 @@ function run_simulation(player1, player2)
     (player1_wins_last_n, player2_wins_last_n, ties_last_n) = (0, 0, 0)
     (player1_wins_first_n, player2_wins_first_n, ties_first_n) = (0, 0, 0)
     (player1_wins_running, player2_wins_running, ties_running) = (0, 0, 0)
-    total = 300000
+    total = 3000
     n = 1000
     print_every = 1000
     last_n_start = total - n
@@ -97,4 +97,9 @@ function run_simulation(player1, player2)
     print_winrate("Overall", player1, player2, player1_wins, player2_wins, ties)
     (player1, player2)
 end
-(player1, player2) = run_simulation(player1, player2)
+
+function start(player1, player2)
+    (player1, player2) = @time run_simulation(player1, player2)
+end
+
+start(player1, player2)
