@@ -38,24 +38,35 @@ function train!(state::LearningAgent)
     batch_rewards =  reduce(hcat, batch_rewards)
     batch_states = map(episode -> create_batch(episode.game_states), state.episode_results)
     batch_states =  reduce(hcat, batch_states)
+    batch_states = reshape(batch_states, (7, 6, 3, :)) 
     data = Flux.Data.DataLoader(batch_states, batch_rewards, batchsize=128, shuffle=true)
     loss(x, y) = Flux.Losses.mse(state.model(x), y)
     Flux.train!(loss, state.model_train.params, data, state.model_train.opt)
 end
 
 function create_batch(states)
-    flattened_states = map(game_state -> vcat(map(piece -> Flux.onehot(piece, [0, 1, 2]), reshape(game_state.board, 42))...), states)
+    flattened_states = map(game_state -> vcat(map(piece -> Flux.onehot(piece, [0, 1, 2]), reshape(game_state.board, 42))...) * 1.0f0, states)
     batch_states = reduce(hcat, flattened_states)
 end
 
 function start_learning_agent() 
-    model = Chain(Dense(6 * 7 * 3, 50, sigmoid), Dense(50, 10, sigmoid), Dense(10, 1, tanh))
+    # model = Chain(Dense(6 * 7 * 3, 50, sigmoid), Dense(50, 10, sigmoid), Dense(10, 1, tanh))
+    model = Chain(
+        Conv((3, 3), 3 => 48, pad=(1, 1), relu), 
+        Dropout(0.5),
+        Conv((3, 3), 48 => 48, pad=(1, 1), relu), 
+        Dropout(0.5),
+        x -> reshape(x, :, size(x, 4)), 
+        Dense(2016, 40, relu),
+        Dropout(0.5),
+        Dense(40, 1, tanh))
     model_train = ModelTrainingInfo(ADAM(0.001, (0.9, 0.8)), Flux.params(model))
     LearningAgent(model, [], [], model_train, 0.5)
 end
 
 function get_values(state::LearningAgent, states)
     batch_states = create_batch(states)
+    batch_states = reshape(batch_states, (7, 6, 3, :))
     state.model(batch_states)
 end
 

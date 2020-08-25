@@ -54,7 +54,7 @@ function run_simulation(player1, player2)
     (player1_wins_last_n, player2_wins_last_n, ties_last_n) = (0, 0, 0)
     (player1_wins_first_n, player2_wins_first_n, ties_first_n) = (0, 0, 0)
     (player1_wins_running, player2_wins_running, ties_running) = (0, 0, 0)
-    total = 3000
+    total = 300000
     n = 1000
     print_every = 1000
     last_n_start = total - n
